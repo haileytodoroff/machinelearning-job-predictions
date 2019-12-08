@@ -6,6 +6,8 @@
 import pandas as pd
 import numpy as np
 from sklearn.ensemble import RandomForestClassifier
+from sklearn.model_selection import train_test_split
+
 
 class Kaggle:
 	def __init__(self):
@@ -27,12 +29,21 @@ class Kaggle:
 
 	# train/test/split, normalize, standardize, feature importance, etc
 	def preprocess(self):
-		# reshape the train data so that is can be used in sklearn (2d data)
-		self.resized_scan_train_images = np.reshape(self.scan_train_images, (3780, 28*28))
+		# train test split on mnist and scan data
+		mX_train, mX_test, my_train, my_test = train_test_split(self.mnist_train_data, self.mnist_train_labels)
+		sX_train, sX_test, sy_train, sy_test = train_test_split(self.scan_train_images, self.scan_train_labels)
 
-		# reshape the test data
-		dims = self.mnist_train_data.shape
-		self.resized_mnist_train_data = np.reshape(self.mnist_train_data, (dims[0], dims[1]*dims[2]))
+		print(len(mX_train))
+		self.X_train = mX_train.join(sX_train)
+		self.Y_train = pd.DataFrame(data=[my_train, sy_train])
+		print(self.X_train.head())
+
+		# reshape the train data so that is can be used in sklearn (2d data)
+		# self.resized_scan_train_images = np.reshape(self.scan_train_images, (3780, 28*28))
+
+		# # reshape the test data
+		# dims = self.mnist_train_data.shape
+		# self.resized_mnist_train_data = np.reshape(self.mnist_train_data, (dims[0], dims[1]*dims[2]))
 
 	def randForrest(self):
 		rf = RandomForestClassifier()
@@ -49,7 +60,7 @@ class Kaggle:
 if __name__ == '__main__':
 	kaggle = Kaggle()
 	kaggle.preprocess()
-	print(kaggle.randForrest())
+	#print(kaggle.randForrest())
 
 
 
